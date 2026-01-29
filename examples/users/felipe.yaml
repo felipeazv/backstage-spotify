@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: felipe
+  annotations:
+    google.com/email: felipe.azv@gmail.com
+spec:
+  profile:
+    displayName: Felipe Azevedo
+    email: felipe.azv@gmail.com
+  memberOf: []
