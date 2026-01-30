@@ -109,6 +109,12 @@ catalog:
       rules:
         - allow: [Template]
 
+    # Spring Boot Service Template
+    - type: file
+      target: ../../examples/template/spring-boot-service-template.yaml
+      rules:
+        - allow: [Template]
+
     # Local example organizational data
     - type: file
       target: ../../examples/org.yaml

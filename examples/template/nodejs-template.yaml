@@ -1,0 +1,73 @@
+apiVersion: backstage.io/v1beta3
+kind: Template
+metadata:
+  name: spring-boot-service-template
+  title: Spring Boot Service Template
+  description: A template for creating Spring Boot services
+  tags:
+    - spring
+    - java
+    - service
+spec:
+  owner: devops
+  type: service
+  parameters:
+    - title: Service Information
+      required:
+        - name
+        - description
+        - package
+      properties:
+        name:
+          title: Service Name
+          type: string
+          description: The name of the Spring Boot service
+          ui:autofocus: true
+          ui:options:
+            rows: 1
+        description:
+          title: Service Description
+          type: string
+          description: A brief description of the service
+          ui:field: MarkdownField
+          ui:widget: textarea
+        package:
+          title: Package Name
+          type: string
+          description: The Java package name for the service (e.g., com.company.service)
+          default: com.example.service
+        javaVersion:
+          title: Java Version
+          type: string
+          enum: ['17', '21']
+          default: '21'
+        version:
+          title: Spring Boot Version
+          type: string
+          enum: ['3.2.0', '3.4.2']
+          default: '3.4.2'
+  steps:
+    - id: fetch-template
+      name: Fetch Template
+      action: fetch:template
+      input:
+        url: ./hello-spring-boot
+        values:
+          serviceName: '{{ parameters.name }}'
+          serviceDescription: '{{ parameters.description }}'
+          packageName: '{{ parameters.package }}'
+          javaVersion: '{{ parameters.javaVersion }}'
+          springBootVersion: '{{ parameters.version }}'
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: '{{ parameters.description }}'
+        repoUrl: '{{ parameters.repoUrl }}'
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: '{{ steps.publish.output.repoContentsUrl }}'
+        catalogFilename: catalog-info.yaml
