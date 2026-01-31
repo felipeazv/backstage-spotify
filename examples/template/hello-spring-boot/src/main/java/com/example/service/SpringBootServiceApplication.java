@@ -1,10 +1,10 @@
-package {{packageName}};
+package com.example.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Main application class for the {{serviceName}} Spring Boot service.
+ * Main application class for the Spring Boot service.
  * 
  * This service provides:
  * - Health check endpoints via Spring Boot Actuator
@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * - OpenAPI/Swagger documentation (if enabled)
  * 
  * @author Backstage Template Generator
- * @version {{springBootVersion}}
+ * @version 1.0.0
  */
 @SpringBootApplication
 public class SpringBootServiceApplication {

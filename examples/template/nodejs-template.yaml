@@ -53,21 +53,21 @@ spec:
       input:
         url: ./hello-spring-boot
         values:
-          serviceName: '{{ parameters.name }}'
-          serviceDescription: '{{ parameters.description }}'
-          packageName: '{{ parameters.package }}'
-          javaVersion: '{{ parameters.javaVersion }}'
-          springBootVersion: '{{ parameters.version }}'
+          serviceName: '${{ parameters.name }}'
+          serviceDescription: '${{ parameters.description }}'
+          packageName: '${{ parameters.package }}'
+          javaVersion: '${{ parameters.javaVersion }}'
+          springBootVersion: '${{ parameters.version }}'
     - id: publish
       name: Publish
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        description: '{{ parameters.description }}'
-        repoUrl: '{{ parameters.repoUrl }}'
+        description: '${{ parameters.description }}'
+        repoUrl: '${{ parameters.repoUrl }}'
     - id: register
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: '{{ steps.publish.output.repoContentsUrl }}'
+        repoContentsUrl: '${{ steps.publish.output.repoContentsUrl }}'
         catalogFilename: catalog-info.yaml

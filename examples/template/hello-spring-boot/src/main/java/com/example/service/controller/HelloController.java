@@ -1,4 +1,4 @@
-package {{packageName}}.controller;
+package com.example.service.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * Hello Controller for {{serviceName}}
+ * Hello Controller
  * 
  * Provides a simple hello world endpoint for testing and demonstration purposes.
  */
@@ -26,6 +26,6 @@ public class HelloController {
     @GetMapping("/hello")
     @Operation(summary = "Get hello message", description = "Returns a simple hello world message")
     public ResponseEntity<String> sayHello() {
-        return ResponseEntity.ok("Hello from {{serviceName}}! Service is running with Java {{javaVersion}} and Spring Boot {{springBootVersion}}");
+        return ResponseEntity.ok("Hello from Spring Boot service! Service is running with Java 17 and Spring Boot 3.2.0");
     }
 }

@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: {{serviceName|lower|replace:' ':'-'}}
+    name: ${{serviceName}}
   profiles:
     active: dev
 
@@ -13,7 +13,7 @@ spring:
 logging:
   level:
     root: INFO
-    {{packageName}}: DEBUG
+    ${{packageName}}: DEBUG
     org.springframework: INFO
     org.hibernate: INFO
   pattern:
@@ -21,7 +21,6 @@ logging:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 # Spring Boot Actuator configuration
-{{#if includeActuator}}
 management:
   endpoints:
     web:
@@ -35,10 +34,8 @@ management:
   health:
     probes:
       enabled: true
-{{/if}}
 
 # OpenAPI/Swagger configuration
-{{#if includeSwagger}}
 springdoc:
   api-docs:
     path: /api-docs
@@ -46,4 +43,3 @@ springdoc:
     path: /swagger-ui.html
     config-url: /v3/api-docs/swagger-config
     url: /api-docs
-{{/if}}

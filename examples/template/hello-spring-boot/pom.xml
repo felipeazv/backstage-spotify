@@ -8,21 +8,21 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>{{springBootVersion}}</version>
+        <version>3.4.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>{{packageName}}</groupId>
-    <artifactId>{{serviceName|lower|replace:' ':'-'}}</artifactId>
+    <groupId>com.example.service</groupId>
+    <artifactId>hello-spring-boot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>{{serviceName}}</name>
-    <description>{{serviceDescription}}</description>
+    <name>Hello Spring Boot Service</name>
+    <description>A Spring Boot service template for Backstage</description>
 
     <properties>
-        <java.version>{{javaVersion}}</java.version>
-        <maven.compiler.source>{{javaVersion}}</maven.compiler.source>
-        <maven.compiler.target>{{javaVersion}}</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>21</java.version>
+        <spring-boot.version>3.4.2</spring-boot.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -33,13 +33,11 @@
         </dependency>
 
         <!-- Spring Boot Actuator for health checks and metrics -->
-        {{#if includeActuator}}
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-        {{/if}}
-
+        
         <!-- Spring Boot Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -54,14 +52,12 @@
         </dependency>
 
         <!-- OpenAPI 3 / Swagger Documentation -->
-        {{#if includeSwagger}}
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.6.0</version>
         </dependency>
-        {{/if}}
-
+       
         <!-- Lombok for reducing boilerplate code -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -91,9 +87,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>{{javaVersion}}</source>
-                    <target>{{javaVersion}}</target>
-                    <release>{{javaVersion}}</release>
+                    <source>21</source>
+                    <target>21</target>
+                    <release>21</release>
                 </configuration>
             </plugin>
         </plugins>
