@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: hello-spring-boot-backstage
+  description: A Spring Boot service scaffolded from Backstage template
+  tags:
+    - spring-boot
+    - java
+    - service
+  annotations:
+    backstage.io/kubernetes-id: hello-spring-boot-backstage
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: service
+  lifecycle: experimental
+  owner: user:guest
+  

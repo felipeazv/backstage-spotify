@@ -19,6 +19,7 @@ backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
 backend.add(
   import('@backstage/plugin-scaffolder-backend-module-notifications'),
 );
+backend.add(import('@roadiehq/scaffolder-backend-module-utils'));
 
 // techdocs plugin
 backend.add(import('@backstage/plugin-techdocs-backend'));

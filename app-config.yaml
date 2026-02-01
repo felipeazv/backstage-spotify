@@ -127,6 +127,12 @@ catalog:
       rules:
         - allow: [User]
 
+    # Scaffolded hello-spring-boot-backstage service
+    - type: url
+      target: https://github.com/felipeazv/hello-spring-boot-backstage/blob/main/catalog-info.yaml
+      rules:
+        - allow: [Component]
+
     ## Uncomment these lines to add more example data
     # - type: url
     #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml

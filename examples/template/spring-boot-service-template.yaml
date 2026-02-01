@@ -62,14 +62,57 @@ spec:
       input:
         url: ./hello-spring-boot
         values:
-          serviceName: '${{ parameters.name }}'
-          serviceDescription: '${{ parameters.description }}'
-          packageName: '${{ parameters.package }}'
-          javaVersion: '${{ parameters.javaVersion }}'
-          springBootVersion: '${{ parameters.version }}'
+          name: '${{ parameters.name }}'
+          owner: '${{ parameters.owner }}'
+          description: '${{ parameters.description }}'
+          repoUrl: '${{ parameters.repoUrl }}'
+    - id: create-docs-dir
+      name: Create docs directory
+      action: roadiehq:utils:fs:write
+      input:
+        path: ./docs/index.md
+        content: |
+          # ${{ parameters.name }}
+          
+          This is a Spring Boot service scaffolded from Backstage template.
+          
+          ## API Endpoints
+          
+          - `GET /api/hello` - Returns a hello message
+          - `GET /actuator/health` - Health check endpoint
+          
+          ## Running the Service
+          
+          ```bash
+          ./mvnw spring-boot:run
+          ```
+          
+          ## Building
+          
+          ```bash
+          ./mvnw clean package
+          ```
+          
+          ## Docker
+          
+          The service can be run using Docker:
+          
+          ```bash
+          docker-compose up
+          ```
+          
+          ## Configuration
+          
+          The service is configured via `application.yml` in the `src/main/resources` directory.
     - id: publish
       name: Publish
       action: publish:github
       input:
         description: '${{ parameters.description }}'
         repoUrl: '${{ parameters.repoUrl }}'
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: '${{ steps.publish.output.repoContentsUrl }}'
+        catalogInfoPath: '/catalog-info.yaml'
