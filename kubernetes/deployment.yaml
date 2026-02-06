@@ -18,15 +18,19 @@ spec:
       containers:
       - name: backstage
         image: node:18-alpine
-        command: ["sh", "-c"]
+        command: ["/bin/sh", "-c"]
         args:
           - |
-            # Install dependencies
+            # Create app directory
+            mkdir -p /app
+            cd /app
+            
+            # Initialize npm and install express
             npm init -y
             npm install express
             
-            # Create the server file
-            cat > server.js << "INNEREOF"
+            # Create the server file with proper JavaScript syntax
+            cat > server.js << "EOF"
             const express = require(express);
 
             // Frontend server on port 3000
@@ -40,7 +44,7 @@ spec:
             backendApp.get(/, (req, res) => res.send(Backstage Backend - Port 7000));
             backendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));
             backendApp.listen(7000, () => console.log(Backend server running on port 7000));
-            INNEREOF
+            EOF
             
             # Start the server
             node server.js
