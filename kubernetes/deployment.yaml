@@ -21,24 +21,28 @@ spec:
         command: ["sh", "-c"]
         args:
           - |
-            npm init -y &&
-            npm install express &&
-            mkdir -p /app &&
-            echo 'const express = require("express");
+            # Install dependencies
+            npm init -y
+            npm install express
+            
+            # Create the server file
+            cat > server.js << "INNEREOF"
+            const express = require(express);
 
             // Frontend server on port 3000
             const frontendApp = express();
-            frontendApp.get("/", (req, res) => res.send("Backstage Frontend - Port 3000"));
-            frontendApp.get("/healthcheck", (req, res) => res.status(200).send("OK"));
-            frontendApp.listen(3000, () => console.log("Frontend server running on port 3000"));
+            frontendApp.get(/, (req, res) => res.send(Backstage Frontend - Port 3000));
+            frontendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));
+            frontendApp.listen(3000, () => console.log(Frontend server running on port 3000));
 
             // Backend server on port 7000
             const backendApp = express();
-            backendApp.get("/", (req, res) => res.send("Backstage Backend - Port 7000"));
-            backendApp.get("/healthcheck", (req, res) => res.status(200).send("OK"));
-            backendApp.listen(7000, () => console.log("Backend server running on port 7000"));
-            ' > /app/server.js &&
-            cd /app &&
+            backendApp.get(/, (req, res) => res.send(Backstage Backend - Port 7000));
+            backendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));
+            backendApp.listen(7000, () => console.log(Backend server running on port 7000));
+            INNEREOF
+            
+            # Start the server
             node server.js
         ports:
         - containerPort: 3000
