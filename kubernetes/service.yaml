@@ -1,15 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backstage-spotify-service
+  name: backstage-service
   namespace: backstage-spotify
   labels:
-    app: backstage-spotify
+    app: backstage
 spec:
   selector:
-    app: backstage-spotify
+    app: backstage
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3000
+      targetPort: 80
+      name: http
   type: ClusterIP

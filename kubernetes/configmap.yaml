@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backstage-config
+  namespace: backstage-spotify
+data:
+  app-config.yaml: |
+    app:
+      title: Backstage Spotify Integration
+      baseUrl: http://localhost:3000
+
+    backend:
+      baseUrl: http://localhost:3000
+      listen:
+        port: 3000
+      database:
+        client: better-sqlite3
+        connection: ":memory:"
+
+    integrations:
+      github:
+        - host: github.com
+          token: \${GITHUB_TOKEN}
+
+    proxy:
+      {}
+
+    techdocs:
+      builder: "local"
+      generator:
+        runIn: "docker"
+      publisher:
+        type: "local"
+
+    scaffolder:
+      {}
+
+    catalog:
+      import:
+        entityFilename: catalog-info.yaml
+      rules:
+        - allow: [Component, System, API, Resource, Location]
+      locations:
+        - type: "github"
+          target: "https://github.com/felipeazv/BACKSTAGE-SPOTIFY/blob/main/catalog-info.yaml"
