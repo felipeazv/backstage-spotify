@@ -17,10 +17,34 @@ spec:
     spec:
       containers:
       - name: backstage
-        image: nginx:alpine
+        image: node:18-alpine
+        command: ["sh", "-c"]
+        args:
+          - |
+            npm init -y &&
+            npm install express &&
+            mkdir -p /app &&
+            echo 'const express = require("express");
+
+            // Frontend server on port 3000
+            const frontendApp = express();
+            frontendApp.get("/", (req, res) => res.send("Backstage Frontend - Port 3000"));
+            frontendApp.get("/healthcheck", (req, res) => res.status(200).send("OK"));
+            frontendApp.listen(3000, () => console.log("Frontend server running on port 3000"));
+
+            // Backend server on port 7000
+            const backendApp = express();
+            backendApp.get("/", (req, res) => res.send("Backstage Backend - Port 7000"));
+            backendApp.get("/healthcheck", (req, res) => res.status(200).send("OK"));
+            backendApp.listen(7000, () => console.log("Backend server running on port 7000"));
+            ' > /app/server.js &&
+            cd /app &&
+            node server.js
         ports:
-        - containerPort: 80
-          name: http
+        - containerPort: 3000
+          name: frontend
+        - containerPort: 7000
+          name: backend
         resources:
           limits:
             cpu: "500m"
@@ -30,13 +54,13 @@ spec:
             memory: 512Mi
         livenessProbe:
           httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 30
+            path: /healthcheck
+            port: 3000
+          initialDelaySeconds: 60
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
+            path: /healthcheck
+            port: 3000
+          initialDelaySeconds: 30
           periodSeconds: 5
