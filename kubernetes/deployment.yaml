@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage-spotify
+  namespace: backstage-spotify
+  labels:
+    app: backstage-spotify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage-spotify
+  template:
+    metadata:
+      labels:
+        app: backstage-spotify
+    spec:
+      containers:
+      - name: backstage
+        image: node:18-alpine
+        workingDir: /app
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            yarn install &&
+            yarn build &&
+            yarn workspace app build &&
+            cd packages/backend &&
+            yarn start
+        env:
+        - name: APP_CONFIG_backend_database_connection_string
+          value: "sqlite3::memory:"
+        - name: NODE_ENV
+          value: "production"
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: app-config
+          mountPath: /app/app-config.production.yaml
+          subPath: app-config.production.yaml
+      volumes:
+      - name: app-config
+        configMap:
+          name: backstage-spotify-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backstage-spotify-config
+  namespace: backstage-spotify
+data:
+  app-config.production.yaml: |
+    app:
+      title: Backstage Spotify Integration
+      baseUrl: http://localhost:3000
+    
+    backend:
+      baseUrl: http://localhost:3000
+      listen:
+        port: 3000
+      database:
+        client: better-sqlite3
+        connection: ':memory:'
+    
+    integrations:
+      github:
+        - host: github.com
+          token: ${GITHUB_TOKEN}
+    
+    proxy:
+      {}
+    
+    techdocs:
+      builder: 'local'
+      generator:
+        runIn: 'docker'
+      publisher:
+        type: 'local'
+    
+    scaffolder:
+      {}
+    
+    catalog:
+      import:
+        entityFilename: catalog-info.yaml
+      rules:
+        - allow: [Component, System, API, Resource, Location]
+      locations:
+        - type: 'github'
+          target: 'https://github.com/felipeazv/BACKSTAGE-SPOTIFY/blob/main/catalog-info.yaml'
