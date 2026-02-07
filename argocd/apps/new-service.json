@@ -1,0 +1,6 @@
+{
+  "name": "new-service",
+  "repoUrl": "https://github.com/felipeazv/new-service.git",
+  "appPath": "k8s",
+  "namespace": "apps"
+}
