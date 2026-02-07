@@ -140,7 +140,7 @@ spec:
           
           This PR adds the ArgoCD application config for `${{ parameters.name }}`.
         commitMessage: "feat: add ArgoCD config for ${{ parameters.name }}"
-        targetPath: catalog/argocd/apps
+        targetPath: argocd/apps
         sourcePath: ./argocd-config
     - id: register
       name: Register

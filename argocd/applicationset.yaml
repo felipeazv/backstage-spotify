@@ -12,7 +12,7 @@ spec:
         repoURL: https://github.com/felipeazv/backstage-spotify.git
         revision: HEAD
         files:
-          - path: "catalog/argocd/apps/*.json"
+          - path: "argocd/apps/*.json"
   template:
     metadata:
       name: "{{name}}"
