@@ -55,6 +55,11 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
+        namespace:
+          title: Kubernetes Namespace
+          type: string
+          description: The Kubernetes namespace to deploy the service to
+          default: apps
   steps:
     - id: fetch-template
       name: Fetch Template
@@ -66,6 +71,7 @@ spec:
           owner: '${{ parameters.owner }}'
           description: '${{ parameters.description }}'
           repoUrl: '${{ parameters.repoUrl }}'
+          namespace: '${{ parameters.namespace }}'
     - id: create-docs-dir
       name: Create docs directory
       action: roadiehq:utils:fs:write
@@ -104,15 +110,50 @@ spec:
           ## Configuration
           
           The service is configured via `application.yml` in the `src/main/resources` directory.
+    - id: create-argocd-json
+      name: Create ArgoCD Config File
+      action: roadiehq:utils:fs:write
+      input:
+        path: ./argocd-config/${{ parameters.name }}.json
+        content: |
+          {
+            "name": "${{ parameters.name }}",
+            "repoUrl": "https://github.com/${{ (parameters.repoUrl | parseRepoUrl).owner }}/${{ (parameters.repoUrl | parseRepoUrl).repo }}.git",
+            "path": "k8s",
+            "namespace": "${{ parameters.namespace }}"
+          }
     - id: publish
       name: Publish
       action: publish:github
       input:
         description: '${{ parameters.description }}'
         repoUrl: '${{ parameters.repoUrl }}'
+    - id: create-argocd-config
+      name: Create ArgoCD Config
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?owner=felipeazv&repo=backstage-k8s
+        branchName: add-argocd-${{ parameters.name }}
+        title: "Add ArgoCD config for ${{ parameters.name }}"
+        description: |
+          Auto-generated ArgoCD configuration from Backstage scaffolder.
+          
+          This PR adds the ArgoCD application config for `${{ parameters.name }}`.
+        commitMessage: "feat: add ArgoCD config for ${{ parameters.name }}"
+        targetPath: catalog/argocd/apps
+        sourcePath: ./argocd-config
     - id: register
       name: Register
       action: catalog:register
       input:
         repoContentsUrl: '${{ steps.publish.output.repoContentsUrl }}'
         catalogInfoPath: '/catalog-info.yaml'
+  output:
+    links:
+      - title: Repository
+        url: '${{ steps.publish.output.remoteUrl }}'
+      - title: ArgoCD Config PR
+        url: '${{ steps["create-argocd-config"].output.pullRequestUrl }}'
+      - title: Open in catalog
+        icon: catalog
+        entityRef: '${{ steps.register.output.entityRef }}'

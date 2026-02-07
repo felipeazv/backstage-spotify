@@ -1,0 +1,36 @@
+# ApplicationSet for auto-discovering apps
+# Uses Git generator to scan config files in the gitops repo
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: backstage-apps
+  namespace: argocd
+spec:
+  generators:
+    # Git generator reads app configs from the gitops repo
+    - git:
+        repoURL: https://github.com/felipeazv/backstage-k8s.git
+        revision: HEAD
+        files:
+          - path: "catalog/argocd/apps/*.json"
+  template:
+    metadata:
+      name: "{{name}}"
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: "{{repoUrl}}"
+        targetRevision: HEAD
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
