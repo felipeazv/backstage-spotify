@@ -19,32 +19,17 @@ spec:
       - name: backstage
         image: node:18-alpine
         command: ["/bin/sh", "-c"]
+        workingDir: /app
         args:
           - |
-            # Create app directory
+            # Create app directory and initialize
             mkdir -p /app
             cd /app
-            
-            # Initialize npm and install express
             npm init -y
             npm install express
             
-            # Create the server file with proper JavaScript syntax
-            cat > server.js << "EOF"
-            const express = require(express);
-
-            // Frontend server on port 3000
-            const frontendApp = express();
-            frontendApp.get(/, (req, res) => res.send(Backstage Frontend - Port 3000));
-            frontendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));
-            frontendApp.listen(3000, () => console.log(Frontend server running on port 3000));
-
-            // Backend server on port 7000
-            const backendApp = express();
-            backendApp.get(/, (req, res) => res.send(Backstage Backend - Port 7000));
-            backendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));
-            backendApp.listen(7000, () => console.log(Backend server running on port 7000));
-            EOF
+            # Create server.js using printf to avoid quote issues
+            printf "const express = require(express);\n\n// Frontend server on port 3000\nconst frontendApp = express();\nfrontendApp.get(/, (req, res) => res.send(Backstage Frontend - Port 3000));\nfrontendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));\nfrontendApp.listen(3000, () => console.log(Frontend server running on port 3000));\n\n// Backend server on port 7000\nconst backendApp = express();\nbackendApp.get(/, (req, res) => res.send(Backstage Backend - Port 7000));\nbackendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));\nbackendApp.listen(7000, () => console.log(Backend server running on port 7000));\n" > server.js
             
             # Start the server
             node server.js
