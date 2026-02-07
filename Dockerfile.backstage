@@ -1,0 +1,47 @@
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json yarn.lock ./
+
+# Install dependencies
+RUN yarn install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN yarn build
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Install socat for port forwarding
+RUN apk add --no-cache socat
+
+# Set working directory
+WORKDIR /app
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/yarn.lock ./
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S backstage -u 1001
+
+# Copy app-config.yaml
+COPY app-config.yaml ./
+
+# Change ownership
+RUN chown -R backstage:nodejs /app
+USER backstage
+
+# Expose port
+EXPOSE 7000
+
+# Start the application
+CMD ["yarn", "start"]

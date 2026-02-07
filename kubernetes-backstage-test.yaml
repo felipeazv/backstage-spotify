@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backstage-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage-test
+  namespace: backstage-test
+  labels:
+    app: backstage-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage-test
+  template:
+    metadata:
+      labels:
+        app: backstage-test
+    spec:
+      containers:
+      - name: backstage-test
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backstage-test-service
+  namespace: backstage-test
+  labels:
+    app: backstage-test
+spec:
+  selector:
+    app: backstage-test
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP

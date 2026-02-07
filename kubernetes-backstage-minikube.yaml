@@ -1,0 +1,207 @@
+# Backstage Kubernetes Deployment for Minikube (with SQLite - no PostgreSQL needed)
+# Based on: https://backstage.io/docs/deployment/k8s
+# 
+# Usage:
+#   1. Create secrets first (see below)
+#   2. Build the image: eval $(minikube docker-env) && docker build -f packages/backend/Dockerfile -t backstage:local .
+#   3. Apply: kubectl apply -f kubernetes-backstage-minikube.yaml
+#   4. Port-forward: kubectl port-forward -n backstage svc/backstage 7007:7007
+#   5. Access: http://localhost:7007
+#
+# Create secrets with:
+#   kubectl create secret generic backstage-secrets -n backstage \
+#     --from-literal=GITHUB_CLIENT_ID=<your-github-client-id> \
+#     --from-literal=GITHUB_CLIENT_SECRET=<your-github-client-secret> \
+#     --from-literal=GOOGLE_CLIENT_ID=<your-google-client-id> \
+#     --from-literal=GOOGLE_CLIENT_SECRET=<your-google-client-secret> \
+#     --from-literal=GITHUB_TOKEN=<your-github-token>
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backstage
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backstage
+  namespace: backstage
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backstage-app-config
+  namespace: backstage
+data:
+  # Override production config to use SQLite instead of PostgreSQL
+  app-config.local.yaml: |
+    app:
+      baseUrl: http://localhost:7007
+
+    backend:
+      baseUrl: http://localhost:7007
+      listen: ':7007'
+      # Use SQLite instead of PostgreSQL for local development
+      database:
+        client: better-sqlite3
+        connection: ':memory:'
+
+    # Auth providers - override resolvers to not require catalog User entities
+    auth:
+      providers:
+        guest: {}
+        github:
+          development:
+            clientId: ${GITHUB_CLIENT_ID}
+            clientSecret: ${GITHUB_CLIENT_SECRET}
+            signIn:
+              resolvers:
+                # Use emailMatchingUserEntityProfileEmail which creates users dynamically
+                - resolver: usernameMatchingUserEntityName
+        google:
+          development:
+            clientId: ${GOOGLE_CLIENT_ID}
+            clientSecret: ${GOOGLE_CLIENT_SECRET}
+            signIn:
+              resolvers:
+                - resolver: emailMatchingUserEntityAnnotation
+
+    # Override catalog locations with absolute paths for container environment
+    catalog:
+      locations:
+        - type: file
+          target: /app/examples/entities.yaml
+        - type: file
+          target: /app/examples/template/template.yaml
+          rules:
+            - allow: [Template]
+        - type: file
+          target: /app/examples/template/spring-boot-service-template.yaml
+          rules:
+            - allow: [Template]
+        - type: file
+          target: /app/examples/org.yaml
+          rules:
+            - allow: [User, Group]
+        - type: file
+          target: /app/examples/users/felipe.yaml
+          rules:
+            - allow: [User]
+        - type: url
+          target: https://github.com/felipeazv/hello-spring-boot-backstage/blob/main/catalog-info.yaml
+          rules:
+            - allow: [Component]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage
+  namespace: backstage
+  labels:
+    app.kubernetes.io/name: backstage
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: backstage
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: backstage
+        app.kubernetes.io/component: backend
+    spec:
+      serviceAccountName: backstage
+      containers:
+        - name: backstage
+          image: backstage:local
+          imagePullPolicy: Never  # Use local image from minikube's Docker
+          # Override the CMD to include local config that uses SQLite
+          command: ["node", "packages/backend", "--config", "app-config.yaml", "--config", "app-config.local.yaml"]
+          ports:
+            - name: http
+              containerPort: 7007
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: production
+            # GitHub OAuth credentials
+            - name: GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: GITHUB_CLIENT_ID
+            - name: GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: GITHUB_CLIENT_SECRET
+            # Google OAuth credentials
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: GOOGLE_CLIENT_ID
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: GOOGLE_CLIENT_SECRET
+            # GitHub Token for integrations
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: GITHUB_TOKEN
+          volumeMounts:
+            - name: app-config
+              mountPath: /app/app-config.local.yaml
+              subPath: app-config.local.yaml
+              readOnly: true
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 7007
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 7007
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+        - name: app-config
+          configMap:
+            name: backstage-app-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backstage
+  namespace: backstage
+  labels:
+    app.kubernetes.io/name: backstage
+    app.kubernetes.io/component: backend
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: backstage
+    app.kubernetes.io/component: backend
+  ports:
+    - name: http
+      port: 7007
+      targetPort: http
+      protocol: TCP
