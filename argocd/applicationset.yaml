@@ -24,7 +24,7 @@ spec:
       source:
         repoURL: "{{repoUrl}}"
         targetRevision: HEAD
-        path: "{{path}}"
+        path: "{{appPath}}"
       destination:
         server: https://kubernetes.default.svc
         namespace: "{{namespace}}"
