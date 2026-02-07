@@ -132,7 +132,7 @@ spec:
       name: Create ArgoCD Config
       action: publish:github:pull-request
       input:
-        repoUrl: github.com?owner=felipeazv&repo=backstage-k8s
+        repoUrl: github.com?owner=felipeazv&repo=backstage-spotify
         branchName: add-argocd-${{ parameters.name }}
         title: "Add ArgoCD config for ${{ parameters.name }}"
         description: |
