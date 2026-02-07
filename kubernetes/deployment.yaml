@@ -17,22 +17,20 @@ spec:
     spec:
       containers:
       - name: backstage
-        image: node:18-alpine
+        image: python:3.9-alpine
         command: ["/bin/sh", "-c"]
-        workingDir: /app
         args:
           - |
-            # Create app directory and initialize
-            mkdir -p /app
-            cd /app
-            npm init -y
-            npm install express
-            
-            # Create server.js using printf to avoid quote issues
-            printf "const express = require(express);\n\n// Frontend server on port 3000\nconst frontendApp = express();\nfrontendApp.get(/, (req, res) => res.send(Backstage Frontend - Port 3000));\nfrontendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));\nfrontendApp.listen(3000, () => console.log(Frontend server running on port 3000));\n\n// Backend server on port 7000\nconst backendApp = express();\nbackendApp.get(/, (req, res) => res.send(Backstage Backend - Port 7000));\nbackendApp.get(/healthcheck, (req, res) => res.status(200).send(OK));\nbackendApp.listen(7000, () => console.log(Backend server running on port 7000));\n" > server.js
-            
-            # Start the server
-            node server.js
+            apk add --no-cache socat &&
+            echo "Starting server on port 3000" > /tmp/port3000.html &&
+            echo "Backstage Frontend - Port 3000" >> /tmp/port3000.html &&
+            echo "Starting server on port 7000" > /tmp/port7000.html &&
+            echo "Backstage Backend - Port 7000" >> /tmp/port7000.html &&
+            # Start servers in background
+            socat TCP-LISTEN:3000,fork,reuseaddr SYSTEM:'echo -e "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n$(cat /tmp/port3000.html)"' & 
+            socat TCP-LISTEN:7000,fork,reuseaddr SYSTEM:'echo -e "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n$(cat /tmp/port7000.html)"' & 
+            # Keep the container running
+            tail -f /dev/null
         ports:
         - containerPort: 3000
           name: frontend
@@ -40,20 +38,8 @@ spec:
           name: backend
         resources:
           limits:
-            cpu: "500m"
-            memory: 1Gi
+            cpu: "200m"
+            memory: 256Mi
           requests:
-            cpu: 250m
-            memory: 512Mi
-        livenessProbe:
-          httpGet:
-            path: /healthcheck
-            port: 3000
-          initialDelaySeconds: 60
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /healthcheck
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 5
+            cpu: 100m
+            memory: 128Mi
