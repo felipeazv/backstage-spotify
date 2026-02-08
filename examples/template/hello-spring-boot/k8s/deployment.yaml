@@ -31,8 +31,8 @@ spec:
     spec:
       containers:
         - name: ${{ values.name }}
-          image: docker.io/${{ values.repoOwner }}/${{ values.repoName }}:latest
-          imagePullPolicy: Always  # Pull from Docker Hub
+          image: ghcr.io/${{ values.repoOwner }}/${{ values.repoName }}:latest
+          imagePullPolicy: Always  # Pull from GitHub Container Registry
           ports:
             - name: http
               containerPort: 8080
