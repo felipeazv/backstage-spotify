@@ -17,6 +17,11 @@ spec:
     metadata:
       name: "{{name}}"
       namespace: argocd
+      labels:
+        app.kubernetes.io/managed-by: backstage-scaffolder
+        backstage.io/source: scaffolder
+      annotations:
+        backstage.io/template: spring-boot-service-template
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:

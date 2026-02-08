@@ -120,7 +120,9 @@ spec:
             "name": "${{ parameters.name }}",
             "repoUrl": "https://github.com/${{ (parameters.repoUrl | parseRepoUrl).owner }}/${{ (parameters.repoUrl | parseRepoUrl).repo }}.git",
             "appPath": "k8s",
-            "namespace": "${{ parameters.namespace }}"
+            "namespace": "${{ parameters.namespace }}",
+            "scaffoldedBy": "backstage",
+            "template": "spring-boot-service-template"
           }
     - id: publish
       name: Publish
