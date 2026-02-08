@@ -129,11 +129,11 @@ spec:
         description: '${{ parameters.description }}'
         repoUrl: '${{ parameters.repoUrl }}'
     - id: create-argocd-config
-      name: Create ArgoCD Config
+      name: Create ArgoCD Config PR
       action: publish:github:pull-request
       input:
         repoUrl: github.com?owner=felipeazv&repo=backstage-spotify
-        branchName: add-argocd-${{ parameters.name }}
+        branchName: argocd-${{ parameters.name }}
         title: "Add ArgoCD config for ${{ parameters.name }}"
         description: |
           Auto-generated ArgoCD configuration from Backstage scaffolder.
@@ -142,6 +142,8 @@ spec:
         commitMessage: "feat: add ArgoCD config for ${{ parameters.name }}"
         targetPath: argocd/apps
         sourcePath: ./argocd-config
+        gitAuthorName: Backstage Scaffolder
+        gitAuthorEmail: scaffolder@backstage.io
     - id: register
       name: Register
       action: catalog:register
