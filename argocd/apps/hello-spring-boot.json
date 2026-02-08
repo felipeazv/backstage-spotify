@@ -1,6 +1,0 @@
-{
-  "name": "hello-spring-boot",
-  "repoUrl": "https://github.com/felipeazv/hello-spring-boot-backstage.git",
-  "appPath": "k8s",
-  "namespace": "apps"
-}
