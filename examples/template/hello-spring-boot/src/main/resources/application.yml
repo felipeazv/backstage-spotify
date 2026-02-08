@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: ${{serviceName}}
+    name: ${{ values.name }}
   profiles:
     active: dev
 
@@ -13,7 +13,7 @@ spring:
 logging:
   level:
     root: INFO
-    ${{packageName}}: DEBUG
+    com.example: DEBUG
     org.springframework: INFO
     org.hibernate: INFO
   pattern:

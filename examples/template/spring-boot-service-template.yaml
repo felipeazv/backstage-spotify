@@ -72,6 +72,8 @@ spec:
           description: '${{ parameters.description }}'
           repoUrl: '${{ parameters.repoUrl }}'
           namespace: '${{ parameters.namespace }}'
+          repoOwner: '${{ (parameters.repoUrl | parseRepoUrl).owner }}'
+          repoName: '${{ (parameters.repoUrl | parseRepoUrl).repo }}'
     - id: create-docs-dir
       name: Create docs directory
       action: roadiehq:utils:fs:write
