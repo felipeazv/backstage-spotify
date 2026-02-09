@@ -3,7 +3,7 @@
 # 
 # Usage:
 #   1. Create secrets first (see below)
-#   2. Build the image: eval $(minikube docker-env) && docker build -f packages/backend/Dockerfile -t backstage:local .
+#   2. Build the image: eval $(minikube docker-env) && docker build -f packages/backend/Dockerfile -t backstage:v4 .
 #   3. Apply: kubectl apply -f kubernetes-backstage-minikube.yaml
 #   4. Port-forward: kubectl port-forward -n backstage svc/backstage 7007:7007
 #   5. Access: http://localhost:7007
@@ -115,7 +115,7 @@ spec:
       serviceAccountName: backstage
       containers:
         - name: backstage
-          image: backstage:local
+          image: backstage:v4
           imagePullPolicy: Never  # Use local image from minikube's Docker
           # Override the CMD to include local config that uses SQLite
           command: ["node", "packages/backend", "--config", "app-config.yaml", "--config", "app-config.local.yaml"]
