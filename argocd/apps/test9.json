@@ -1,8 +1,0 @@
-{
-  "name": "test9",
-  "repoUrl": "https://github.com/felipeazv/test9.git",
-  "appPath": "k8s",
-  "namespace": "apps",
-  "scaffoldedBy": "backstage",
-  "template": "spring-boot-service-template"
-}
