@@ -1,0 +1,6 @@
+{
+  "name": "test6",
+  "repoUrl": "https://github.com/felipeazv/test6.git",
+  "appPath": "k8s",
+  "namespace": "apps"
+}
