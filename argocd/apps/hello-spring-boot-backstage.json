@@ -1,0 +1,8 @@
+{
+  "name": "hello-spring-boot-backstage",
+  "repoUrl": "https://github.com/felipeazv/hello-spring-boot-backstage.git",
+  "appPath": "k8s",
+  "namespace": "apps",
+  "scaffoldedBy": "backstage",
+  "template": "spring-boot-service-template"
+}
