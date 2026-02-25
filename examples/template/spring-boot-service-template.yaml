@@ -16,7 +16,6 @@ spec:
       required:
         - name
         - description
-        - package
         - repoUrl
       properties:
         name:
@@ -32,6 +31,16 @@ spec:
           description: A brief description of the service
           ui:field: MarkdownField
           ui:widget: textarea
+        repoUrl:
+          title: Repository URL
+          type: string
+          description: The GitHub repository URL for the service
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+    - title: Configuration & Deployment
+      properties:
         package:
           title: Package Name
           type: string
@@ -47,14 +56,6 @@ spec:
           type: string
           enum: ['3.2.0', '3.4.2']
           default: '3.4.2'
-        repoUrl:
-          title: Repository URL
-          type: string
-          description: The GitHub repository URL for the service
-          ui:field: RepoUrlPicker
-          ui:options:
-            allowedHosts:
-              - github.com
         namespace:
           title: Kubernetes Namespace
           type: string
@@ -65,6 +66,7 @@ spec:
           type: boolean
           description: Enable PostgreSQL as the persistence layer with Flyway migrations
           default: false
+          ui:widget: checkbox
   steps:
     - id: fetch-template
       name: Fetch Template
