@@ -75,8 +75,8 @@ data:
           target: /app/examples/template/template.yaml
           rules:
             - allow: [Template]
-        - type: file
-          target: /app/examples/template/spring-boot-service-template.yaml
+        - type: url
+          target: https://raw.githubusercontent.com/felipeazv/backstage-spotify/main/examples/template/spring-boot-service-template.yaml
           rules:
             - allow: [Template]
         - type: file
