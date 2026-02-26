@@ -91,118 +91,6 @@ data:
           target: https://github.com/felipeazv/hello-spring-boot-backstage/blob/main/catalog-info.yaml
           rules:
             - allow: [Component]
-        - type: file
-          target: /backstage-templates/spring-boot-service-template.yaml
-          rules:
-            - allow: [Template]
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: backstage-templates
-  namespace: backstage
-data:
-  spring-boot-service-template.yaml: |
-    apiVersion: scaffolder.backstage.io/v1beta3
-    kind: Template
-    metadata:
-      name: spring-boot-service-template
-      title: Spring Boot Service Template
-      description: A template for creating Spring Boot services with optional PostgreSQL support
-      tags:
-        - spring
-        - java
-        - service
-    spec:
-      owner: devops
-      type: service
-      parameters:
-        - title: Service Information
-          required:
-            - name
-            - description
-            - repoUrl
-          properties:
-            name:
-              title: Service Name
-              type: string
-              description: The name of the Spring Boot service
-              ui:autofocus: true
-              ui:options:
-                rows: 1
-            description:
-              title: Service Description
-              type: string
-              description: A brief description of the service
-              ui:field: MarkdownField
-              ui:widget: textarea
-            repoUrl:
-              title: Repository URL
-              type: string
-              description: The GitHub repository URL for the service
-              ui:field: RepoUrlPicker
-              ui:options:
-                allowedHosts:
-                  - github.com
-        - title: Configuration & Deployment
-          properties:
-            package:
-              title: Package Name
-              type: string
-              description: The Java package name for the service (e.g., com.example.service)
-              default: com.example.service
-            javaVersion:
-              title: Java Version
-              type: string
-              enum: ['17', '21']
-              default: '21'
-            version:
-              title: Spring Boot Version
-              type: string
-              enum: ['3.2.0', '3.4.2']
-              default: '3.4.2'
-            namespace:
-              title: Kubernetes Namespace
-              type: string
-              description: The Kubernetes namespace to deploy the service to
-              default: apps
-            usePostgres:
-              title: Use PostgreSQL
-              type: boolean
-              description: Enable PostgreSQL as the persistence layer with Flyway migrations
-              default: false
-              ui:widget: checkbox
-      steps:
-        - id: fetch-template
-          name: Fetch Template
-          action: fetch:template
-          input:
-            url: https://github.com/felipeazv/backstage-spotify/tree/main/examples/template/hello-spring-boot
-            values:
-              name: '${{ parameters.name }}'
-              description: '${{ parameters.description }}'
-              repoUrl: '${{ parameters.repoUrl }}'
-              package: '${{ parameters.package }}'
-              javaVersion: '${{ parameters.javaVersion }}'
-              version: '${{ parameters.version }}'
-              namespace: '${{ parameters.namespace }}'
-              usePostgres: '${{ parameters.usePostgres }}'
-              repoOwner: '${{ (parameters.repoUrl | parseRepoUrl).owner }}'
-              repoName: '${{ (parameters.repoUrl | parseRepoUrl).repo }}'
-        - id: publish
-          name: Publish
-          action: publish:github
-          input:
-            allowedHosts: ['github.com']
-            description: 'Create a new repo with Spring Boot service'
-            repoUrl: '${{ parameters.repoUrl }}'
-            repoVisibility: public
-        - id: register
-          name: Register in Catalog
-          action: catalog:register
-          input:
-            repoContentsUrl: '${{ steps["publish"].output.repoContentsUrl }}'
-            catalogInfoPath: '/catalog-info.yaml'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -271,9 +159,6 @@ spec:
               mountPath: /app/app-config.local.yaml
               subPath: app-config.local.yaml
               readOnly: true
-            - name: backstage-templates
-              mountPath: /backstage-templates
-              readOnly: true
           resources:
             requests:
               memory: "256Mi"
@@ -301,9 +186,6 @@ spec:
         - name: app-config
           configMap:
             name: backstage-app-config
-        - name: backstage-templates
-          configMap:
-            name: backstage-templates
 ---
 apiVersion: v1
 kind: Service
