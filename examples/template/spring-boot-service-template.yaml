@@ -40,6 +40,7 @@ spec:
             allowedHosts:
               - github.com
     - title: Configuration & Deployment
+      required: []
       properties:
         package:
           title: Package Name
