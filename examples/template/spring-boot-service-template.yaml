@@ -75,9 +75,11 @@ spec:
         url: ./hello-spring-boot
         values:
           name: '${{ parameters.name }}'
-          owner: '${{ parameters.owner }}'
           description: '${{ parameters.description }}'
           repoUrl: '${{ parameters.repoUrl }}'
+          package: '${{ parameters.package }}'
+          javaVersion: '${{ parameters.javaVersion }}'
+          version: '${{ parameters.version }}'
           namespace: '${{ parameters.namespace }}'
           usePostgres: '${{ parameters.usePostgres }}'
           repoOwner: '${{ (parameters.repoUrl | parseRepoUrl).owner }}'
