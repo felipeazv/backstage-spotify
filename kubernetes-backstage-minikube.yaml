@@ -159,6 +159,10 @@ spec:
               mountPath: /app/app-config.local.yaml
               subPath: app-config.local.yaml
               readOnly: true
+            - name: spring-boot-template
+              mountPath: /app/examples/template/spring-boot-service-template.yaml
+              subPath: spring-boot-service-template.yaml
+              readOnly: true
           resources:
             requests:
               memory: "256Mi"
@@ -186,6 +190,9 @@ spec:
         - name: app-config
           configMap:
             name: backstage-app-config
+        - name: spring-boot-template
+          configMap:
+            name: spring-boot-template-config
 ---
 apiVersion: v1
 kind: Service
