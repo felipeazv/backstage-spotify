@@ -8,13 +8,11 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - JAVA_OPTS=-Xmx512m
-{%- if values.usePostgres %}
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_NAME=${{ values.name }}_db
+      - DB_NAME=sample-service_db
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-{%- endif %}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
@@ -24,18 +22,15 @@ services:
     restart: unless-stopped
     networks:
       - app-network
-{%- if values.usePostgres %}
     depends_on:
       postgres:
         condition: service_healthy
-{%- endif %}
 
-{%- if values.usePostgres %}
   postgres:
     image: postgres:16-alpine
-    container_name: ${{ values.name }}-postgres
+    container_name: sample-service-postgres
     environment:
-      POSTGRES_DB: ${{ values.name }}_db
+      POSTGRES_DB: sample-service_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -43,7 +38,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ${{ values.name }}_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sample-service_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -51,14 +46,11 @@ services:
     restart: unless-stopped
     networks:
       - app-network
-{%- endif %}
 
 networks:
   app-network:
     driver: bridge
 
-{%- if values.usePostgres %}
 volumes:
   postgres-data:
     driver: local
-{%- endif %}

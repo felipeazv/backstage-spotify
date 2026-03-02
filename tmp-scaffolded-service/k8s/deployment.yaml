@@ -1,30 +1,29 @@
-# Kubernetes deployment for ${{ values.name }}
+# Kubernetes deployment for sample-service
 # Deploy to minikube:
 #   kubectl apply -f k8s/
-#   kubectl port-forward -n ${{ values.namespace }} svc/${{ values.name }} 8080:8080
+#   kubectl port-forward -n apps svc/sample-service 8080:8080
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ${{ values.namespace }}
-{%- if values.usePostgres %}
+  name: apps
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ${{ values.name }}-db-config
-  namespace: ${{ values.namespace }}
+  name: sample-service-db-config
+  namespace: apps
 data:
-  DB_HOST: "${{ values.name }}-postgres.{{ values.namespace }}.svc.cluster.local"
+  DB_HOST: "sample-service-postgres.apps.svc.cluster.local"
   DB_PORT: "5432"
-  DB_NAME: "${{ values.name }}_db"
+  DB_NAME: "sample-service_db"
   DB_USER: "postgres"
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ${{ values.name }}-db-secret
-  namespace: ${{ values.namespace }}
+  name: sample-service-db-secret
+  namespace: apps
 type: Opaque
 stringData:
   DB_PASSWORD: "postgres"
@@ -32,23 +31,23 @@ stringData:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: ${{ values.name }}-postgres
-  namespace: ${{ values.namespace }}
+  name: sample-service-postgres
+  namespace: apps
   labels:
-    app: ${{ values.name }}-postgres
-    app.kubernetes.io/name: ${{ values.name }}-postgres
+    app: sample-service-postgres
+    app.kubernetes.io/name: sample-service-postgres
     app.kubernetes.io/component: database
 spec:
-  serviceName: ${{ values.name }}-postgres
+  serviceName: sample-service-postgres
   replicas: 1
   selector:
     matchLabels:
-      app: ${{ values.name }}-postgres
+      app: sample-service-postgres
   template:
     metadata:
       labels:
-        app: ${{ values.name }}-postgres
-        app.kubernetes.io/name: ${{ values.name }}-postgres
+        app: sample-service-postgres
+        app.kubernetes.io/name: sample-service-postgres
         app.kubernetes.io/component: database
     spec:
       containers:
@@ -62,17 +61,17 @@ spec:
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: ${{ values.name }}-db-config
+                  name: sample-service-db-config
                   key: DB_NAME
             - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
-                  name: ${{ values.name }}-db-config
+                  name: sample-service-db-config
                   key: DB_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: ${{ values.name }}-db-secret
+                  name: sample-service-db-secret
                   key: DB_PASSWORD
           resources:
             requests:
@@ -86,7 +85,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - pg_isready -U postgres -d ${{ values.name }}_db
+                - pg_isready -U postgres -d sample-service_db
             initialDelaySeconds: 30
             periodSeconds: 10
             failureThreshold: 3
@@ -95,7 +94,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - pg_isready -U postgres -d ${{ values.name }}_db
+                - pg_isready -U postgres -d sample-service_db
             initialDelaySeconds: 10
             periodSeconds: 5
             failureThreshold: 3
@@ -118,10 +117,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${{ values.name }}-postgres
-  namespace: ${{ values.namespace }}
+  name: sample-service-postgres
+  namespace: apps
   labels:
-    app: ${{ values.name }}-postgres
+    app: sample-service-postgres
 spec:
   clusterIP: None  # Headless service for StatefulSet
   ports:
@@ -130,79 +129,48 @@ spec:
       protocol: TCP
       name: postgres
   selector:
-    app: ${{ values.name }}-postgres
-{%- endif %}
+    app: sample-service-postgres
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${{ values.name }}
-  namespace: ${{ values.namespace }}
+  name: sample-service
+  namespace: apps
   labels:
-    app: ${{ values.name }}
-    app.kubernetes.io/name: ${{ values.name }}
+    app: sample-service
+    app.kubernetes.io/name: sample-service
     app.kubernetes.io/component: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ${{ values.name }}
+      app: sample-service
   template:
     metadata:
       labels:
-        app: ${{ values.name }}
-        app.kubernetes.io/name: ${{ values.name }}
+        app: sample-service
+        app.kubernetes.io/name: sample-service
         app.kubernetes.io/component: backend
     spec:
       imagePullSecrets:
         - name: ghcr-secret
-{%- if values.usePostgres %}
       initContainers:
         - name: wait-for-postgres
           image: busybox:1.35
           command:
             - 'sh'
             - '-c'
-            - 'until nc -z ${{ values.name }}-postgres.{{ values.namespace }}.svc.cluster.local 5432; do echo waiting for postgres; sleep 2; done;'
-{%- endif %}
+            - 'until nc -z sample-service-postgres.apps.svc.cluster.local 5432; do echo waiting for postgres; sleep 2; done;'
       containers:
-        - name: ${{ values.name }}
-          image: ghcr.io/${{ values.repoOwner }}/${{ values.repoName }}:latest
-          imagePullPolicy: Always  # Pull from GitHub Container Registry
+        - name: sample-service
+          image: hashicorp/http-echo:0.2.3
+          args:
+            - "-text=[{\"id\":1,\"alias\":\"persuasive-donkey\"},{\"id\":2,\"alias\":\"hopeful-stair\"},{\"id\":3,\"alias\":\"curious-mountain\"}]"
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
-          env:
-            - name: JAVA_OPTS
-              value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
-{%- if values.usePostgres %}
-            - name: DB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: ${{ values.name }}-db-config
-                  key: DB_HOST
-            - name: DB_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: ${{ values.name }}-db-config
-                  key: DB_PORT
-            - name: DB_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: ${{ values.name }}-db-config
-                  key: DB_NAME
-            - name: DB_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: ${{ values.name }}-db-config
-                  key: DB_USER
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ${{ values.name }}-db-secret
-                  key: DB_PASSWORD
-{%- endif %}
           resources:
             requests:
               memory: "256Mi"
@@ -228,10 +196,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${{ values.name }}
-  namespace: ${{ values.namespace }}
+  name: sample-service
+  namespace: apps
   labels:
-    app: ${{ values.name }}
+    app: sample-service
 spec:
   type: ClusterIP
   ports:
@@ -240,4 +208,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: ${{ values.name }}
+    app: sample-service
