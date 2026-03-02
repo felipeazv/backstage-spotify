@@ -82,7 +82,7 @@ spec:
           javaVersion: '${{ parameters.javaVersion }}'
           version: '${{ parameters.version }}'
           namespace: '${{ parameters.namespace }}'
-          usePostgres: '${{ parameters.usePostgres }}'
+          usePostgres: ${{ parameters.usePostgres }}
           repoOwner: '${{ (parameters.repoUrl | parseRepoUrl).owner }}'
           repoName: '${{ (parameters.repoUrl | parseRepoUrl).repo }}'
     - id: create-docs-dir
