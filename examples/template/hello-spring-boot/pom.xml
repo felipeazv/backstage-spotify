@@ -64,7 +64,7 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-{{#if usePostgres}}
+{% if values.usePostgres %}
 
         <!-- PostgreSQL Driver -->
         <dependency>
@@ -90,7 +90,7 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
-{{/if}}
+{% endif %}
     </dependencies>
 
     <build>
