@@ -163,6 +163,14 @@ spec:
               mountPath: /app/examples/template/spring-boot-service-template.yaml
               subPath: spring-boot-service-template.yaml
               readOnly: true
+            - name: spring-boot-pom
+              mountPath: /app/examples/template/hello-spring-boot/pom.xml
+              subPath: pom.xml
+              readOnly: true
+            - name: spring-boot-app-config
+              mountPath: /app/examples/template/hello-spring-boot/src/main/resources/application.yml
+              subPath: application.yml
+              readOnly: true
           resources:
             requests:
               memory: "256Mi"
@@ -193,6 +201,12 @@ spec:
         - name: spring-boot-template
           configMap:
             name: spring-boot-template-config
+        - name: spring-boot-pom
+          configMap:
+            name: spring-boot-pom-config
+        - name: spring-boot-app-config
+          configMap:
+            name: spring-boot-app-config
 ---
 apiVersion: v1
 kind: Service
