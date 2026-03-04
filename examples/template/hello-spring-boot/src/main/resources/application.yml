@@ -5,12 +5,12 @@ server:
 
 spring:
   application:
-    name: ${{ values.name }}
+    name: {{ values.name }}
   profiles:
     active: dev
 {% if values.usePostgres %}
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:${{ values.name }}_db}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:{{ values.name }}_db}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver

@@ -1,7 +1,7 @@
-package com.example.service.controller;
+package {{ values.package }}.controller;
 
-import com.example.service.persistence.HelloEntry;
-import com.example.service.persistence.HelloEntryService;
+import {{ values.package }}.persistence.HelloEntry;
+import {{ values.package }}.persistence.HelloEntryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.service.persistence;
+package {{ values.package }}.persistence;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

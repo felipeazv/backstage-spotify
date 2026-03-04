@@ -1,4 +1,4 @@
-package com.example.service.persistence;
+package {{ values.package }}.persistence;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.example.service.persistence;
+package {{ values.package }}.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
