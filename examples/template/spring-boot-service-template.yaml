@@ -160,7 +160,7 @@ spec:
         gitAuthorName: Backstage Scaffolder
         gitAuthorEmail: scaffolder@backstage.io
     - id: register
-      name: Register
+      name: Register in Catalog
       action: catalog:register
       input:
         repoContentsUrl: '${{ steps.publish.output.repoContentsUrl }}'
@@ -173,4 +173,4 @@ spec:
         url: '${{ steps["create-argocd-config"].output.pullRequestUrl }}'
       - title: Open in catalog
         icon: catalog
-        entityRef: '${{ steps.register.output.entityRef }}'
+        entityRef: '${{ steps.register.output.entityRef | default("component:default/" + parameters.name) }}'
