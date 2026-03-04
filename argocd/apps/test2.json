@@ -1,8 +1,0 @@
-{
-  "name": "test2",
-  "repoUrl": "https://github.com/feazesa/test2.git",
-  "appPath": "k8s",
-  "namespace": "apps",
-  "scaffoldedBy": "backstage",
-  "template": "spring-boot-service-template"
-}
